@@ -14,16 +14,6 @@ class jmeter(
 
   Exec { path => '/bin:/usr/bin:/usr/sbin' }
 
-  $jdk_pkg = $::osfamily ? {
-    debian => 'openjdk-6-jre-headless',
-    redhat => 'java-1.6.0-openjdk'
-  }
-
-  package { $jdk_pkg:
-    ensure => present,
-  }
-
-
   exec { 'download-jmeter':
     command => "wget -P /root http://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${jmeter_version}.tgz",
     creates => "/root/apache-jmeter-${jmeter_version}.tgz"
@@ -46,7 +36,7 @@ class jmeter(
       command => "unzip -q -d JMeterPlugins JMeterPlugins-${jmeter_plugins_version}.zip && mv JMeterPlugins/JMeterPlugins.jar /usr/share/jmeter/lib/ext",
       cwd     => '/root',
       creates => '/usr/share/jmeter/lib/ext/JMeterPlugins.jar',
-      require => [Exec['install-jmeter'], Exec['download-jmeter-plugins']],
+      require => Exec['download-jmeter-plugins']],
     }
   }
 }
