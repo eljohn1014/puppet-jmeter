@@ -23,9 +23,6 @@ class jmeter(
     ensure => present,
   }
 
-  package { 'unzip':
-    ensure => present,
-  }
 
   exec { 'download-jmeter':
     command => "wget -P /root http://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${jmeter_version}.tgz",
@@ -39,17 +36,17 @@ class jmeter(
     require => Exec['download-jmeter'],
   }
 
-  if $jmeter_plugins_install == True {  
+  if $jmeter_plugins_install == True {
     exec { 'download-jmeter-plugins':
       command => "wget -P /root http://jmeter-plugins.googlecode.com/files/JMeterPlugins-${jmeter_plugins_version}.zip",
-      creates => '/root/JMeterPlugins-${jmeter_plugins_version}.zip'
+      creates => "/root/JMeterPlugins-${jmeter_plugins_version}.zip"
     }
 
     exec { 'install-jmeter-plugins':
       command => "unzip -q -d JMeterPlugins JMeterPlugins-${jmeter_plugins_version}.zip && mv JMeterPlugins/JMeterPlugins.jar /usr/share/jmeter/lib/ext",
       cwd     => '/root',
       creates => '/usr/share/jmeter/lib/ext/JMeterPlugins.jar',
-      require => [Package['unzip'], Exec['install-jmeter'], Exec['download-jmeter-plugins']],
+      require => [Exec['install-jmeter'], Exec['download-jmeter-plugins']],
     }
   }
 }
